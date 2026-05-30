@@ -1,0 +1,11 @@
+After you run flutter create, open android/app/build.gradle.kts and make sure minSdk is 28.
+
+Find:
+    minSdk = flutter.minSdkVersion
+
+Change to:
+    minSdk = 28
+
+Keep your namespace/applicationId matching the package path used by MainActivity.kt:
+    namespace = "com.devlabs.woosim_printer_flutter"
+    applicationId = "com.devlabs.woosim_printer_flutter"
