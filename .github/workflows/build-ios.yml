@@ -1,4 +1,4 @@
-name: Build iOS IPA
+name: Build iOS IPA (unsigned)
 
 on:
   workflow_dispatch:
@@ -20,40 +20,31 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Flutter doctor
-        run: flutter doctor -v
-
-      - name: Check project files
-        run: |
-          pwd
-          ls -la
-          test -f pubspec.yaml
-          test -d ios
-          test -f ios/Podfile
-
       - name: Get Flutter packages
         run: flutter pub get
 
-      - name: Clean iOS pods
+      - name: Install CocoaPods dependencies
         run: |
           cd ios
-          rm -rf Pods Podfile.lock
-          pod repo update
           pod install --repo-update
           cd ..
 
-      - name: Build iOS without code signing
-        run: flutter build ios --release --no-codesign
+      - name: Build iOS (no code signing)
+        run: |
+          flutter build ios --release --no-codesign
 
       - name: Package unsigned IPA
         run: |
           mkdir -p build/ios/ipa/Payload
           cp -R build/ios/iphoneos/Runner.app build/ios/ipa/Payload/
           cd build/ios/ipa
-          zip -r WoosimPrinter_unsigned.ipa Payload
+          zip -r WoosimPrinter_unsigned.ipa Payload/
+          echo "IPA created:"
+          ls -lh WoosimPrinter_unsigned.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: WoosimPrinter-iOS-unsigned
           path: build/ios/ipa/WoosimPrinter_unsigned.ipa
+          retention-days: 7
